@@ -5,8 +5,17 @@
   --accent-light: #ffffff;        /* الأبيض للأزرار والتفاصيل */
   --accent-dark: #6e48aa;         /* موف داكن لتأثيرات الوقوف (Hover) */
 
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color-scheme: light;
+}
+
+/* تخصيص الخط للغة الإنجليزية */
+html[lang="en"] body {
+  font-family: "Merriweather", serif;
+}
+
+/* تخصيص خط Amiri للغة العربية */
+html[lang="ar"] body {
+  font-family: 'Amiri', serif;
 }
 
 body {
@@ -14,7 +23,6 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
 }
-
 /* زر بخلفية بيضاء ونص موف داكن */
 .btn-primary {
   background-color: var(--accent-light);
