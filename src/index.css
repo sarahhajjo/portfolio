@@ -1,19 +1,16 @@
 :root {
-  --bg-color: rgb(145, 109, 207); /* الخلفية الموف الأساسية */
-  --text-primary: #ffffff;        /* ناصع البياض للنصوص البارزة */
-  --text-secondary: #f0e6ff;      /* أبيض مائل للموف للنصوص الفرعية */
-  --accent-light: #ffffff;        /* الأبيض للأزرار والتفاصيل */
-  --accent-dark: #6e48aa;         /* موف داكن لتأثيرات الوقوف (Hover) */
+  --bg-color: #0b0f19;
+  --text-primary: #ffffff;
+  --text-secondary: #8b949e;
+  --accent-green: #00ff66; /* أبقيناه للنصوص إذا احتجته، لكن الأزرار لن تستخدمه */
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
-/* تخصيص الخط للغة الإنجليزية */
 html[lang="en"] body {
   font-family: "Merriweather", serif;
 }
 
-/* تخصيص خط Amiri للغة العربية */
 html[lang="ar"] body {
   font-family: 'Amiri', serif;
 }
@@ -23,40 +20,245 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
 }
-/* زر بخلفية بيضاء ونص موف داكن */
-.btn-primary {
-  background-color: var(--accent-light);
-  color: var(--accent-dark);
-  border: none;
-  padding: 12px 28px;
-  border-radius: 8px;
-  font-size: 1rem;
+
+.tech-font {
+  font-family: 'Space Mono', monospace;
+}
+
+/* ----------------------------------- */
+/*      الأزرار الأساسية (اللون الموف)     */
+/* ----------------------------------- */
+.btn-neon {
+  background-color: #A855F7;
+  color: #ffffff;
+  border: 1px solid #A855F7;
+  padding: 12px 24px;
   font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Space Mono', monospace;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* زر مفرغ بحدود بيضاء ونص أبيض */
-.btn-outline {
+.btn-neon:hover {
   background-color: transparent;
-  color: var(--text-primary);
-  border: 2px solid var(--accent-light);
-  padding: 10px 26px;
-  border-radius: 8px;
-  font-size: 1rem;
+  color: #A855F7;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+}
+
+.btn-outline-neon {
+  background-color: transparent;
+  color: #A855F7;
+  border: 1px solid #A855F7;
+  padding: 12px 24px;
   font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Space Mono', monospace;
+}
+
+.btn-outline-neon:hover {
+  background-color: #A855F7;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+}
+
+/* ----------------------------------- */
+/*             الأزرار الموف               */
+/* ----------------------------------- */
+.btn-neon-purple {
+  background-color: #A855F7;
+  color: #ffffff;
+  border: 1px solid #A855F7;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.btn-neon-purple:hover {
+  background-color: transparent;
+  color: #A855F7;
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+}
+
+.btn-outline-neon-purple {
+  background-color: transparent;
+  color: #A855F7;
+  border: 1px solid #A855F7;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.btn-outline:hover {
-  background-color: var(--accent-light);
-  color: var(--accent-dark);
-  transform: translateY(-2px);
+.btn-outline-neon-purple:hover {
+  background-color: #A855F7;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+/* ----------------------------------- */
+/*    زر الأكولايزر (موف بالكامل)      */
+/* ----------------------------------- */
+.btn-neon-equalizer {
+  position: relative;
+  background-color: #0d1117;
+  border: 1.5px solid #A855F7; /* إطار موف */
+  color: #ffffff;
+  padding: 12px 28px;
+  font-family: 'Space Mono', monospace;
+  font-weight: bold;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.15), inset 0 0 10px rgba(168, 85, 247, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-neon-equalizer:hover {
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.5), inset 0 0 18px rgba(168, 85, 247, 0.25);
+  border-color: #c084fc; /* موف فاتح عند اللمس */
+}
+
+.btn-neon-equalizer .btn-text {
+  position: relative;
+  z-index: 2;
+  transition: text-shadow 0.3s ease;
+}
+
+.btn-neon-equalizer:hover .btn-text {
+  text-shadow: 0 0 8px #A855F7, 0 0 16px rgba(168, 85, 247, 0.6); /* توهج موف للنص */
+}
+
+.equalizer-container {
+  position: absolute;
+  bottom: 2px;
+  left: 10px;
+  right: 10px;
+  height: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.equalizer-container .bar {
+  width: 2.5px;
+  height: 100%;
+  background: linear-gradient(to top, #A855F7, #e9d5ff); /* تدرج موف للأعمدة */
+  box-shadow: 0 0 4px #A855F7;
+  border-radius: 2px;
+  transform-origin: bottom;
+  transform: scaleY(0.15);
+}
+
+/* ----------------------------------- */
+/*   Slide to Download (موف بالكامل)   */
+/* ----------------------------------- */
+.slide-download {
+  position: relative;
+  width: fit-content;
+  min-width: 0;
+}
+
+.slide-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  background-color: #0d1117;
+  color: #ffffff;
+  cursor: grab;
+  overflow: hidden;
+  user-select: none;
+  touch-action: pan-y;
+  transition: border-color 0.3s ease;
+}
+
+.slide-track.is-dragging { cursor: grabbing; }
+
+/* إجبار إطار السحب ليكون موف دائماً متجاهلاً أي متغيرات سابقة */
+.slide-progress-border {
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 999px;
+  border: 1.5px solid #A855F7 !important;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.8), inset 0 0 10px rgba(168, 85, 247, 0.6) !important;
+  clip-path: inset(0 calc(100% - var(--progress, 0%)) 0 0);
+  pointer-events: none;
+  transition: clip-path 0.05s linear, border-color 0.3s ease;
+}
+
+.slide-label {
+  position: relative;
+  z-index: 2;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+.slide-label.success { color: #A855F7 !important; }
+
+.slide-rail {
+  position: absolute;
+  inset: 0 14px;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.slide-rail.visible { opacity: 1; }
+.slide-rail::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  border-top: 2px dashed #A855F7 !important; /* طريق موف */
+  opacity: 0.6;
+}
+
+.slide-handle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #A855F7 !important; /* أيقونة موف */
+  filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.8)) !important;
+  z-index: 2;
+  will-change: transform;
+}
+.slide-handle svg { width: 20px; height: 20px; }
+
+.slide-hint {
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--text-secondary, #8b949e);
+  text-align: center;
+  letter-spacing: 0.5px;
 }

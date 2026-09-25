@@ -1,0 +1,22 @@
+.image-grid-wrapper {
+    width: 100%;
+    height: 95vh;
+    position: relative;
+    overflow: hidden;
+
+    border-radius: 60px;
+
+    /* 🔥 التعديل هنا:
+       - أعدنا المركز إلى 50% (المنتصف تماماً).
+       - جعلنا الصورة الصلبة (black) 20% فقط في المنتصف.
+       - جعلنا التلاشي (transparent) يصل للشفافية الكاملة عند 70% (قبل الوصول لأي حافة).
+       هذا سيذيب الخط الأيسر والأيمن بنفس القوة! */
+    -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+    mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+}
+
+.tile {
+    position: absolute;
+    background-repeat: no-repeat;
+    will-change: transform, opacity;
+}
