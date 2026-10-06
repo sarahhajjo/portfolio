@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react';
-import { motion } from 'framer-motion';
+import React, { Suspense, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
@@ -17,9 +17,91 @@ const GithubIcon = () => (
 const LocationIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/></svg>
 );
+const MessagesIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+);
 
 const Contact = () => {
-    const { t } = useTranslation(); // 👈 استدعاء دالة الترجمة هنا
+    const { t, i18n } = useTranslation();
+    const isAr = i18n.language === 'ar';
+
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // --- 1. حالة العداد العام الدائم ---
+    const [globalCount, setGlobalCount] = useState(0);
+
+    // --- 2. حالة الرسائل المخزنة محلياً للمستخدم ---
+    const [userMessages, setUserMessages] = useState([]);
+    const [showMyMessages, setShowMyMessages] = useState(false);
+
+    useEffect(() => {
+        // أ. جلب العداد العام من الـ API بمجرد فتح الصفحة
+        fetch('https://api.counterapi.dev/v1/sarahhajjo/portfolio_messages')
+            .then(res => res.json())
+            .then(data => setGlobalCount(data.count || 0))
+            .catch(err => console.error("Error fetching count:", err));
+
+        // ب. جلب رسائل المستخدم السابقة من ذاكرة المتصفح
+        const saved = localStorage.getItem('sarah_portfolio_msgs');
+        if (saved) {
+            setUserMessages(JSON.parse(saved));
+        }
+    }, []);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        // هنا نستخدم Web3Forms للإرسال الفعلي للإيميل (ضعي مفتاحك الحقيقي هنا)
+        const payload = {
+            access_key: "4cd1f4bb-4aac-43eb-860b-dddd15f79f3f",
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+        };
+
+        try {
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                // 1. زيادة العداد العام (لجميع الزوار)
+                fetch('https://api.counterapi.dev/v1/sarahhajjo/portfolio_messages/up')
+                    .then(res => res.json())
+                    .then(data => setGlobalCount(data.count || globalCount + 1))
+                    .catch(() => setGlobalCount(prev => prev + 1));
+
+                // 2. حفظ الرسالة محلياً لتظهر للمستخدم دائماً
+                const newMsg = {
+                    id: Date.now(),
+                    name: formData.name,
+                    email: formData.email,
+                    message: formData.message,
+                    date: new Date().toLocaleDateString()
+                };
+                const updatedMessages = [newMsg, ...userMessages];
+                localStorage.setItem('sarah_portfolio_msgs', JSON.stringify(updatedMessages));
+                setUserMessages(updatedMessages);
+
+                // 3. إظهار رسالة نجاح وتفريغ الحقول
+                alert(t('success_msg'));
+                setFormData({ name: '', email: '', message: '' });
+                setShowMyMessages(true); // نفتح قسم رسائله فوراً ليرى تأكيد الإرسال
+            }
+        } catch (error) {
+            console.error("Error sending message", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <section
@@ -48,13 +130,14 @@ const Contact = () => {
                 flex: 1
             }}>
 
+                {/* --- النصف الأيسر: الفورم وعداد الرسائل --- */}
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     viewport={{ once: true }}
                     style={{
-                        flex: '0 1 400px',
+                        flex: '0 1 420px',
                         width: '100%',
                         backgroundColor: 'rgba(31, 26, 56, 0.4)',
                         padding: '2.5rem',
@@ -62,98 +145,136 @@ const Contact = () => {
                         border: '1px solid rgba(221, 153, 187, 0.2)',
                         boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
                         backdropFilter: 'blur(10px)',
+                        position: 'relative'
                     }}
                 >
-                    <h2 className="tech-font" style={{ fontSize: '2.5rem', marginBottom: '2rem', color: 'var(--text-primary)', marginTop: 0 }}>
-                        {t('contact_title_get')} <span style={{ color: 'var(--accent-light)' }}>{t('contact_title_touch')}</span>
-                    </h2>
-
-                    <form style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_name')}</label>
-                            <input
-                                type="text"
-                                placeholder={t('name_placeholder')}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.9rem',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                                    color: '#fff',
-                                    outline: 'none',
-                                    fontFamily: 'inherit',
-                                    fontSize: '0.95rem',
-                                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
-                                }}
-                            />
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_email')}</label>
-                            <input
-                                type="email"
-                                placeholder={t('email_placeholder')}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.9rem',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                                    color: '#fff',
-                                    outline: 'none',
-                                    fontFamily: 'inherit',
-                                    fontSize: '0.95rem',
-                                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
-                                }}
-                            />
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_message')}</label>
-                            <textarea
-                                rows="4"
-                                placeholder={t('message_placeholder')}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.9rem',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                                    color: '#fff',
-                                    outline: 'none',
-                                    fontFamily: 'inherit',
-                                    fontSize: '0.95rem',
-                                    resize: 'none',
-                                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
-                                }}
-                            />
-                        </div>
+                    {/* 👇 أيقونة "الرسائل السابقة" وزر التبديل */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h2 className="tech-font" style={{ fontSize: '2.5rem', margin: 0, color: 'var(--text-primary)' }}>
+                            {t('contact_title_get')} <span style={{ color: 'var(--accent-light)' }}>{t('contact_title_touch')}</span>
+                        </h2>
 
                         <button
-                            type="button"
-                            className="tech-font"
-                            style={{
-                                marginTop: '0.5rem',
-                                padding: '0.9rem 2rem',
-                                borderRadius: '8px',
-                                border: '1px solid #DD99BB',
-                                backgroundColor: 'rgba(221, 153, 187, 0.1)',
-                                color: '#DD99BB',
-                                fontSize: '0.95rem',
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                letterSpacing: '1px'
-                            }}
-                            onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(221, 153, 187, 0.3)'}
-                            onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(221, 153, 187, 0.1)'}
+                            onClick={() => setShowMyMessages(!showMyMessages)}
+                            style={{ background: 'transparent', border: 'none', color: '#DD99BB', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                            title={showMyMessages ? t('hide_my_messages') : t('view_my_messages')}
                         >
-                            {t('send_btn')}
+                            <MessagesIcon />
+                            {userMessages.length > 0 && (
+                                <span style={{ background: '#FF2D20', color: '#fff', fontSize: '10px', padding: '2px 6px', borderRadius: '10px', marginTop: '-25px', marginLeft: '15px', fontWeight: 'bold' }}>
+                                    {userMessages.length}
+                                </span>
+                            )}
                         </button>
-                    </form>
+                    </div>
+
+                    {/* 👇 شارة توضح عدد الرسائل الكلي الذي تلقيتِه من الجميع */}
+                    <div style={{ display: 'inline-block', backgroundColor: 'rgba(221, 153, 187, 0.1)', border: '1px solid rgba(221, 153, 187, 0.3)', padding: '6px 12px', borderRadius: '20px', marginBottom: '1.5rem', fontSize: '0.85rem', color: '#EAD7D1' }}>
+                         <strong>{globalCount}</strong> {t('messages_count')}
+                    </div>
+
+                    <AnimatePresence mode='wait'>
+                        {showMyMessages ? (
+                            // --- قسم عرض الرسائل السابقة للمستخدم ---
+                            <motion.div
+                                key="my-messages"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '10px' }}
+                            >
+                                {userMessages.length === 0 ? (
+                                    <p style={{ color: '#EAD7D1', textAlign: 'center', fontStyle: 'italic' }}>{t('no_messages')}</p>
+                                ) : (
+                                    userMessages.map(msg => (
+                                        <div key={msg.id} style={{ backgroundColor: 'rgba(0,0,0,0.3)', borderLeft: `3px solid var(--accent-light)`, padding: '15px', borderRadius: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.8rem', color: '#EAD7D1' }}>
+                                                <strong>{msg.name}</strong>
+                                                <span>{msg.date}</span>
+                                            </div>
+                                            <p style={{ color: '#fff', fontSize: '0.9rem', margin: 0, fontStyle: 'italic', wordBreak: 'break-word' }}>"{msg.message}"</p>
+                                        </div>
+                                    ))
+                                )}
+                            </motion.div>
+                        ) : (
+                            // --- الفورم الأساسي ---
+                            <motion.form
+                                key="contact-form"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                onSubmit={handleSubmit}
+                                style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}
+                            >
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                    <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_name')}</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder={t('name_placeholder')}
+                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                    <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_email')}</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder={t('email_placeholder')}
+                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                    <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_message')}</label>
+                                    <textarea
+                                        name="message"
+                                        rows="4"
+                                        value={formData.message}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder={t('message_placeholder')}
+                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', resize: 'none', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="tech-font"
+                                    style={{
+                                        marginTop: '0.5rem',
+                                        padding: '0.9rem 2rem',
+                                        borderRadius: '8px',
+                                        border: '1px solid #DD99BB',
+                                        backgroundColor: 'rgba(221, 153, 187, 0.1)',
+                                        color: '#DD99BB',
+                                        fontSize: '0.95rem',
+                                        fontWeight: 'bold',
+                                        cursor: isSubmitting ? 'wait' : 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        letterSpacing: '1px',
+                                        opacity: isSubmitting ? 0.6 : 1
+                                    }}
+                                    onMouseOver={(e) => { if (!isSubmitting) e.target.style.backgroundColor = 'rgba(221, 153, 187, 0.3)' }}
+                                    onMouseOut={(e) => { if (!isSubmitting) e.target.style.backgroundColor = 'rgba(221, 153, 187, 0.1)' }}
+                                >
+                                    {isSubmitting ? t('sending_btn') : t('send_btn')}
+                                </button>
+                            </motion.form>
+                        )}
+                    </AnimatePresence>
                 </motion.div>
 
+                {/* --- النصف الأيمن: مجسم الـ 3D --- */}
                 <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -190,6 +311,7 @@ const Contact = () => {
 
             </div>
 
+            {/* --- الشريط السفلي المستقل (Footer) --- */}
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}

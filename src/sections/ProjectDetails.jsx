@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
+import ContactBar from '../components/ContactBar'; // 👈 شريط معلومات التواصل بآخر الصفحة
 
 // مكون زر الجيت هب
 const GithubButton = ({ href, children }) => (
@@ -147,7 +148,7 @@ const ProjectDetails = () => {
     );
 
     return (
-        <div style={{ backgroundColor: '#1F1A38', minHeight: '100vh', overflowX: 'hidden' }}>
+        <div style={{ minHeight: '100vh', overflowX: 'hidden' }}>
             <style>{`
                 .features-grid {
                     display: grid;
@@ -193,7 +194,7 @@ const ProjectDetails = () => {
             <Navbar />
 
             <section style={{
-                padding: '120px 5% 4rem 5%',
+                padding: '120px 5% 2rem 5%', // 👈 قلّلت الـ padding السفلي لأنو الشريط جاي بعده
                 maxWidth: '1400px',
                 margin: '0 auto',
                 direction: isAr ? 'rtl' : 'ltr'
@@ -367,6 +368,11 @@ const ProjectDetails = () => {
 
                 </motion.div>
             </section>
+
+            {/* 👇 شريط معلومات التواصل بآخر الصفحة */}
+            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 5% 2.5rem 5%', boxSizing: 'border-box' }}>
+                <ContactBar />
+            </div>
         </div>
     );
 };
