@@ -1,12 +1,27 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // 👈 استدعاء مكتبة التوجيه
+
 import Navbar from './components/Navbar';
 import Hero from './sections/Hero';
 import Skills from './sections/Skills';
 import Projects from './sections/Projects';
 import Contact from './sections/Contact';
+import ProjectDetails from './sections/ProjectDetails'; // 👈 استدعاء صفحة تفاصيل المشروع الجديدة
+
 import './i18n';
 import './index.css';
+
+// 👈 تجميع أقسام الصفحة الرئيسية في مكون واحد لترتيب الكود
+const Home = () => (
+    <>
+        <Navbar />
+        <Hero />
+        <Skills />
+        <Projects />
+        <Contact />
+    </>
+);
 
 function App() {
     const { i18n } = useTranslation();
@@ -18,13 +33,18 @@ function App() {
     }, [i18n.language]);
 
     return (
-        <div>
-            <Navbar />
-            <Hero />
-            <Skills />
-            <Projects />
-            <Contact />
-        </div>
+        <Router>
+            <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh' }}>
+                <Routes>
+                    {/* 1. مسار الصفحة الرئيسية (يضم كل الأقسام) */}
+                    <Route path="/" element={<Home />} />
+
+                    {/* 2. مسار صفحة تفاصيل المشروع المستقلة */}
+                    {/* عدلي هذا السطر ليكون projects بدلاً من project */}
+                    <Route path="/projects/:id" element={<ProjectDetails />} />
+                </Routes>
+            </div>
+        </Router>
     );
 }
 

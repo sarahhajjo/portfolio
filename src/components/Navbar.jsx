@@ -1,97 +1,136 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom'; // 👈 استدعاء خصائص التنقل
+
+// --- أيقونات التواصل ---
+const GithubIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ transition: 'color 0.3s ease' }}><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+);
+const EmailIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ transition: 'color 0.3s ease' }}><path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.866l5.6-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z"/></svg>
+);
 
 const Navbar = () => {
     const { i18n } = useTranslation();
-    const [isLangOpen, setIsLangOpen] = useState(false); // حالة فتح وإغلاق القائمة
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isImageOpen, setIsImageOpen] = useState(false);
 
-    // دالة لتغيير اللغة وإغلاق القائمة بعدها
+    // 👇 التحقق إذا كنا في صفحة المشاريع
+    const location = useLocation();
+    const navigate = useNavigate();
+    const isProjectPage = location.pathname.includes('/projects/');
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const changeLanguage = (lang) => {
         i18n.changeLanguage(lang);
         setIsLangOpen(false);
     };
 
-    // تحديد اسم اللغة الحالية لعرضه على الزر
     const currentLangName = i18n.language === 'ar' ? 'العربية' : 'English';
 
     return (
-        <nav style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '1.5rem 5%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 10
-        }}>
-            {/* الشعار أو الاسم */}
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--text-primary)' }}>
-                SH<span style={{ color: 'var(--accent-light)' }}>.</span>
-            </div>
+        <>
+            <nav style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: isScrolled ? '1rem 5%' : '1.5rem 5%',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 100,
+                backgroundColor: isScrolled ? 'rgba(15, 10, 25, 0.8)' : 'transparent',
+                backdropFilter: isScrolled ? 'blur(10px)' : 'none',
+                borderBottom: isScrolled ? '1px solid rgba(221, 153, 187, 0.1)' : '1px solid transparent',
+                transition: 'all 0.3s ease'
+            }}>
 
-            {/* حاوية زر الترجمة */}
-            <div style={{ position: 'relative' }}>
-                <button
-                    className="btn-outline"
-                    onClick={() => setIsLangOpen(!isLangOpen)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 20px' }}
-                >
-                    {currentLangName}
-                    <span style={{ fontSize: '0.8rem', transition: '0.3s', transform: isLangOpen ? 'rotate(180deg)' : 'rotate(0)' }}>
-            ▼
-          </span>
-                </button>
+                {/* --- الجزء الأيسر --- */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
 
-                {/* القائمة المنسدلة للخيارات */}
-                {isLangOpen && (
-                    <div style={{
-                        position: 'absolute',
-                        top: '120%',
-                        right: i18n.language === 'en' ? 0 : 'auto',
-                        left: i18n.language === 'ar' ? 0 : 'auto',
-                        backgroundColor: 'var(--bg-color)',
-                        border: '2px solid var(--accent-light)',
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        minWidth: '120px',
-                        boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
-                    }}>
+                    {/* 👇 زر العودة يظهر فقط إذا كنا في صفحة التفاصيل */}
+                    {isProjectPage && (
                         <button
-                            onClick={() => changeLanguage('en')}
+                            onClick={() => navigate('/')}
+                            className="tech-font"
                             style={{
-                                padding: '10px 15px',
-                                backgroundColor: i18n.language === 'en' ? 'var(--accent-light)' : 'transparent',
-                                color: i18n.language === 'en' ? 'var(--accent-dark)' : 'var(--text-primary)',
-                                border: 'none',
-                                textAlign: i18n.language === 'ar' ? 'right' : 'left',
+                                background: 'rgba(234, 215, 209, 0.1)',
+                                border: '1px solid rgba(234, 215, 209, 0.4)',
+                                color: '#EAD7D1',
+                                padding: '6px 12px',
+                                borderRadius: '8px',
                                 cursor: 'pointer',
-                                fontWeight: 'bold'
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                transition: 'all 0.3s ease'
                             }}
+                            onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--accent-light)'}
+                            onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(234, 215, 209, 0.4)'}
                         >
-                            English
+                            ← Back
                         </button>
-                        <button
-                            onClick={() => changeLanguage('ar')}
-                            style={{
-                                padding: '10px 15px',
-                                backgroundColor: i18n.language === 'ar' ? 'var(--accent-light)' : 'transparent',
-                                color: i18n.language === 'ar' ? 'var(--accent-dark)' : 'var(--text-primary)',
-                                border: 'none',
-                                textAlign: i18n.language === 'ar' ? 'right' : 'left',
-                                cursor: 'pointer',
-                                fontWeight: 'bold'
-                            }}
-                        >
-                            العربية
-                        </button>
+                    )}
+
+                    <div
+                        onClick={() => setIsImageOpen(true)}
+                        style={{ width: '45px', height: '45px', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'transform 0.2s ease' }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        <img src="/profile.png" alt="Sarah Hajjo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
                     </div>
+
+                    <span className="tech-font" style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--text-primary)', letterSpacing: '1px' }}>
+                        Sarah Hajjo
+                    </span>
+
+                    <div style={{ display: 'flex', gap: '12px', marginLeft: '10px' }}>
+                        <a href="https://github.com/sarahhajjo" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', transition: 'color 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'} title="GitHub"><GithubIcon /></a>
+                        <a href="mailto:sarahhajjo98@gmail.com" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', transition: 'color 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'} title="Email"><EmailIcon /></a>
+                    </div>
+                </div>
+
+                {/* --- الجزء الأيمن: زر تغيير اللغة --- */}
+                <div style={{ position: 'relative' }}>
+                    <button className="btn-outline tech-font" onClick={() => setIsLangOpen(!isLangOpen)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 20px', fontWeight: 'bold', letterSpacing: '1px' }}>
+                        {currentLangName}
+                        <span style={{ fontSize: '0.8rem', transition: '0.3s', transform: isLangOpen ? 'rotate(180deg)' : 'rotate(0)' }}>▼</span>
+                    </button>
+
+                    {isLangOpen && (
+                        <div style={{ position: 'absolute', top: '120%', right: i18n.language === 'en' ? 0 : 'auto', left: i18n.language === 'ar' ? 0 : 'auto', backgroundColor: 'var(--bg-color)', border: '2px solid var(--accent-light)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', minWidth: '120px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)' }}>
+                            <button className="tech-font" onClick={() => changeLanguage('en')} style={{ padding: '10px 15px', backgroundColor: i18n.language === 'en' ? 'var(--accent-light)' : 'transparent', color: i18n.language === 'en' ? 'var(--accent-dark)' : 'var(--text-primary)', border: 'none', textAlign: i18n.language === 'ar' ? 'right' : 'left', cursor: 'pointer', fontWeight: 'bold' }}>English</button>
+                            <button className="tech-font" onClick={() => changeLanguage('ar')} style={{ padding: '10px 15px', backgroundColor: i18n.language === 'ar' ? 'var(--accent-light)' : 'transparent', color: i18n.language === 'ar' ? 'var(--accent-dark)' : 'var(--text-primary)', border: 'none', textAlign: i18n.language === 'ar' ? 'right' : 'left', cursor: 'pointer', fontWeight: 'bold' }}>العربية</button>
+                        </div>
+                    )}
+                </div>
+            </nav>
+
+            <AnimatePresence>
+                {isImageOpen && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} onClick={() => setIsImageOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10, 5, 20, 0.85)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'zoom-out' }}>
+                        <button onClick={() => setIsImageOpen(false)} style={{ position: 'absolute', top: '30px', right: '40px', background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '2.5rem', cursor: 'pointer', zIndex: 1001 }}>&times;</button>
+                        <motion.img initial={{ scale: 0.5, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.8, opacity: 0, y: 20 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} src="/profile.png" alt="Sarah Hajjo" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: '20px', border: '2px solid rgba(221, 153, 187, 0.5)', boxShadow: '0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(221, 153, 187, 0.2)', cursor: 'default' }} />
+                    </motion.div>
                 )}
-            </div>
-        </nav>
+            </AnimatePresence>
+        </>
     );
 };
 

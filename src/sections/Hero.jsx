@@ -1,14 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import ImageReveal from '../components/ImageReveal';
+import ImageReveal from '../components/ImageReveal'; // 👈 استدعاء مكون الصورة
 
 // --- زر Neon Equalizer ---
 const BAR_COUNT = 22;
 const SIGMA = 0.16;
 const MAX_BOOST = 0.75;
 
-const NeonEqualizerButton = ({ text }) => { // 👈 يستقبل النص كمتغير للترجمة
+const NeonEqualizerButton = ({ text }) => {
     const btnRef = useRef(null);
     const barsRef = useRef([]);
     const pointerRef = useRef({ x: 0.5, y: 0.5, influence: 0, target: 0 });
@@ -107,8 +107,8 @@ const PdfIcon = () => (
     </svg>
 );
 
-// --- زر التحميل (اللون الموف + تقبل الترجمة كـ props) ---
-const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) => {
+// --- زر التحميل (اللون الوردي المضيء Pink Mist) ---
+const VideoStyleDownloadButton = ({ cvUrl = '/Sarah_Hajjo_CV.pdf', label, successLabel }) => {
     const [status, setStatus] = useState('idle');
     const linkRef = useRef(null);
 
@@ -136,22 +136,22 @@ const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) =>
                 animate={status}
                 variants={{
                     idle: {
-                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        borderColor: 'rgba(234, 215, 209, 0.4)', // Powder Petal
                         boxShadow: '0px 0px 0px transparent',
                         backgroundColor: 'transparent',
-                        color: '#ffffff'
+                        color: '#EAD7D1'
                     },
                     animating: {
-                        borderColor: '#A855F7',
-                        boxShadow: '0px 0px 20px rgba(168, 85, 247, 0.6)',
+                        borderColor: '#DD99BB', // Pink Mist
+                        boxShadow: '0px 0px 20px rgba(221, 153, 187, 0.6)',
                         backgroundColor: 'transparent',
-                        color: '#A855F7'
+                        color: '#DD99BB'
                     },
                     success: {
-                        borderColor: '#A855F7',
-                        boxShadow: '0px 0px 25px rgba(168, 85, 247, 0.8)',
-                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                        color: '#A855F7'
+                        borderColor: '#DD99BB',
+                        boxShadow: '0px 0px 25px rgba(221, 153, 187, 0.8)',
+                        backgroundColor: 'rgba(221, 153, 187, 0.1)',
+                        color: '#DD99BB'
                     }
                 }}
                 transition={{ duration: 0.3 }}
@@ -174,7 +174,6 @@ const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) =>
                     overflow: 'hidden'
                 }}
             >
-                {/* النص الافتراضي (مترجم) */}
                 <motion.span
                     variants={{
                         idle: { opacity: 1, y: 0 },
@@ -186,7 +185,6 @@ const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) =>
                     {label}
                 </motion.span>
 
-                {/* طبقة الحركة */}
                 <motion.div
                     variants={{
                         idle: { opacity: 0 },
@@ -195,16 +193,14 @@ const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) =>
                     }}
                     style={{ position: 'absolute', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
                 >
-                    {/* الملف */}
                     <motion.div
                         animate={status === 'animating' ? { y: [-1, 2, -1] } : { y: 0 }}
                         transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
-                        style={{ color: '#A855F7', zIndex: 2, marginBottom: '2px' }}
+                        style={{ color: '#DD99BB', zIndex: 2, marginBottom: '2px' }}
                     >
                         <PdfIcon />
                     </motion.div>
 
-                    {/* الطريق المتحرك الموف */}
                     <div style={{ width: '60%', height: '2px' }}>
                         <motion.div
                             animate={status === 'animating' ? { backgroundPosition: ["0px 0px", "-20px 0px"] } : { backgroundPosition: "0px 0px" }}
@@ -212,20 +208,19 @@ const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) =>
                             style={{
                                 width: '100%',
                                 height: '100%',
-                                backgroundImage: 'repeating-linear-gradient(to right, #A855F7 0, #A855F7 10px, transparent 10px, transparent 20px)'
+                                backgroundImage: 'repeating-linear-gradient(to right, #DD99BB 0, #DD99BB 10px, transparent 10px, transparent 20px)'
                             }}
                         />
                     </div>
                 </motion.div>
 
-                {/* نص النجاح (مترجم) */}
                 <motion.span
                     variants={{
                         idle: { opacity: 0, scale: 0.8 },
                         animating: { opacity: 0, scale: 0.8 },
                         success: { opacity: 1, scale: 1 }
                     }}
-                    style={{ position: 'absolute', textShadow: '0 0 8px rgba(168, 85, 247, 0.8)' }}
+                    style={{ position: 'absolute', textShadow: '0 0 8px rgba(221, 153, 187, 0.8)' }}
                 >
                     {successLabel}
                 </motion.span>
@@ -236,9 +231,8 @@ const VideoStyleDownloadButton = ({ cvUrl = '/cv.pdf', label, successLabel }) =>
     );
 };
 
-// --- مكون الأحرف المتحركة (تم إضافة حماية للغة العربية) ---
+// --- مكون الأحرف المتحركة ---
 const AnimatedText = ({ text, baseDelay = 0, isArabic }) => {
-    // 👈 لحماية الخطوط المتصلة العربية، نمرر الكلمة ككتلة واحدة إذا كانت عربية، ونقطعها حروفاً في الإنجليزية
     const items = isArabic ? [text] : Array.from(text);
     const total = items.length;
 
@@ -250,7 +244,7 @@ const AnimatedText = ({ text, baseDelay = 0, isArabic }) => {
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: baseDelay + ((total - 1 - index) * 0.05), ease: "easeOut" }}
-                    whileHover={{ scale: 1.25, color: '#A855F7', textShadow: '0px 0px 12px rgba(168, 85, 247, 0.8)', transition: { duration: 0.1 } }}
+                    whileHover={{ scale: 1.25, color: 'var(--accent-light)', textShadow: '0px 0px 12px rgba(221, 153, 187, 0.8)', transition: { duration: 0.1 } }}
                     style={{ display: 'inline-block', whiteSpace: char === ' ' ? 'pre' : 'normal', cursor: 'default' }}
                 >
                     {char}
@@ -259,6 +253,7 @@ const AnimatedText = ({ text, baseDelay = 0, isArabic }) => {
         </span>
     );
 };
+
 const Hero = () => {
     const { t, i18n } = useTranslation();
     const isAr = i18n.language === 'ar';
@@ -272,7 +267,6 @@ const Hero = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                // التعديل الأول: الهامش يصبح 5% من اليمين في العربي، و5% من اليسار في الإنجليزي
                 padding: isAr ? '0 5% 0 0' : '0 0 0 5%',
                 position: 'relative',
                 overflow: 'hidden'
@@ -280,6 +274,7 @@ const Hero = () => {
         >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: '-80px' }}>
 
+                {/* --- الجزء الأيسر: النصوص والأزرار --- */}
                 <div style={{ flex: 1, zIndex: 2 }}>
                     <motion.div initial={{ opacity: 0, x: slideDirection }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
                         <p className="tech-font" style={{ color: 'var(--text-secondary)', fontSize: '1rem', letterSpacing: '2px', marginBottom: '1rem' }}>
@@ -296,7 +291,7 @@ const Hero = () => {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 1, repeat: Infinity, repeatType: 'reverse', duration: 0.7 }}
-                                    style={{ color: '#A855F7' }}
+                                    style={{ color: 'var(--accent-light)' }}
                                 >
                                     _
                                 </motion.span>
@@ -314,7 +309,7 @@ const Hero = () => {
                     </motion.div>
                 </div>
 
-                {/* التعديل الثاني: عكسنا إزاحة الصورة للجهة المعاكسة في اللغة العربية لكي لا تقترب كثيراً من حافة الشاشة اليسرى */}
+                {/* --- الجزء الأيمن: مكون الصورة ImageReveal بدلاً من الـ 3D --- */}
                 <div style={{
                     flex: 1.2,
                     height: '100vh',
@@ -328,6 +323,7 @@ const Hero = () => {
                             : { paddingRight: '0', marginRight: '2%', transform: 'translateX(-40px)' }
                     )
                 }}>
+                    {/* استدعاء مكون الصورة هنا */}
                     <ImageReveal />
                 </div>
             </div>
