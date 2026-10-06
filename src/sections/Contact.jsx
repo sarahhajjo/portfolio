@@ -28,21 +28,16 @@ const Contact = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // --- 1. حالة العداد العام الدائم ---
     const [globalCount, setGlobalCount] = useState(0);
-
-    // --- 2. حالة الرسائل المخزنة محلياً للمستخدم ---
     const [userMessages, setUserMessages] = useState([]);
     const [showMyMessages, setShowMyMessages] = useState(false);
 
     useEffect(() => {
-        // أ. جلب العداد العام من الـ API بمجرد فتح الصفحة
         fetch('https://api.counterapi.dev/v1/sarahhajjo/portfolio_messages')
             .then(res => res.json())
             .then(data => setGlobalCount(data.count || 0))
             .catch(err => console.error("Error fetching count:", err));
 
-        // ب. جلب رسائل المستخدم السابقة من ذاكرة المتصفح
         const saved = localStorage.getItem('sarah_portfolio_msgs');
         if (saved) {
             setUserMessages(JSON.parse(saved));
@@ -57,7 +52,6 @@ const Contact = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // هنا نستخدم Web3Forms للإرسال الفعلي للإيميل (ضعي مفتاحك الحقيقي هنا)
         const payload = {
             access_key: "4cd1f4bb-4aac-43eb-860b-dddd15f79f3f",
             name: formData.name,
@@ -73,13 +67,11 @@ const Contact = () => {
             });
 
             if (response.ok) {
-                // 1. زيادة العداد العام (لجميع الزوار)
                 fetch('https://api.counterapi.dev/v1/sarahhajjo/portfolio_messages/up')
                     .then(res => res.json())
                     .then(data => setGlobalCount(data.count || globalCount + 1))
                     .catch(() => setGlobalCount(prev => prev + 1));
 
-                // 2. حفظ الرسالة محلياً لتظهر للمستخدم دائماً
                 const newMsg = {
                     id: Date.now(),
                     name: formData.name,
@@ -91,10 +83,9 @@ const Contact = () => {
                 localStorage.setItem('sarah_portfolio_msgs', JSON.stringify(updatedMessages));
                 setUserMessages(updatedMessages);
 
-                // 3. إظهار رسالة نجاح وتفريغ الحقول
                 alert(t('success_msg'));
                 setFormData({ name: '', email: '', message: '' });
-                setShowMyMessages(true); // نفتح قسم رسائله فوراً ليرى تأكيد الإرسال
+                setShowMyMessages(true);
             }
         } catch (error) {
             console.error("Error sending message", error);
@@ -117,28 +108,58 @@ const Contact = () => {
                 overflow: 'hidden'
             }}
         >
-            <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                width: '100%',
-                maxWidth: '1300px',
-                margin: '0 auto',
-                gap: '2rem',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flex: 1
-            }}>
+            <style>{`
+                .contact-layout {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    max-width: 1300px;
+                    margin: 0 auto;
+                    gap: 4rem;
+                    box-sizing: border-box;
+                }
+                .contact-form-side {
+                    flex: 1;
+                    width: 100%;
+                    max-width: 500px;
+                    box-sizing: border-box;
+                }
+                .contact-earth-side {
+                    flex: 1.5;
+                    width: 100%;
+                    height: 600px;
+                }
+                
+                @media (max-width: 950px) {
+                    .contact-layout {
+                        flex-direction: column;
+                        gap: 2rem;
+                        margin-top: 60px; /* 👈 هذه المسافة ستبعد الفورم عن الشريط العلوي */
+                    }
+                    .contact-form-side {
+                        max-width: 100%;
+                    }
+                    /* 👈 تصغير الحواف الداخلية للفورم ليعطي مساحة أكبر لحقول الكتابة */
+                    .form-container {
+                        padding: 1.5rem !important;
+                    }
+                    .contact-earth-side {
+                        height: 350px; /* 👈 تقليل ارتفاع الكرة الأرضية لتناسب الموبايل */
+                    }
+                }
+            `}</style>
 
-                {/* --- النصف الأيسر: الفورم وعداد الرسائل --- */}
+            <div className="contact-layout" style={{ direction: isAr ? 'rtl' : 'ltr' }}>
+
                 <motion.div
-                    initial={{ opacity: 0, x: -50 }}
+                    className="contact-form-side form-container"
+                    initial={{ opacity: 0, x: isAr ? 50 : -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     viewport={{ once: true }}
                     style={{
-                        flex: '0 1 420px',
-                        width: '100%',
                         backgroundColor: 'rgba(31, 26, 56, 0.4)',
                         padding: '2.5rem',
                         borderRadius: '20px',
@@ -148,9 +169,8 @@ const Contact = () => {
                         position: 'relative'
                     }}
                 >
-                    {/* 👇 أيقونة "الرسائل السابقة" وزر التبديل */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h2 className="tech-font" style={{ fontSize: '2.5rem', margin: 0, color: 'var(--text-primary)' }}>
+                        <h2 className="tech-font" style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', margin: 0, color: 'var(--text-primary)' }}>
                             {t('contact_title_get')} <span style={{ color: 'var(--accent-light)' }}>{t('contact_title_touch')}</span>
                         </h2>
 
@@ -168,14 +188,12 @@ const Contact = () => {
                         </button>
                     </div>
 
-                    {/* 👇 شارة توضح عدد الرسائل الكلي الذي تلقيتِه من الجميع */}
                     <div style={{ display: 'inline-block', backgroundColor: 'rgba(221, 153, 187, 0.1)', border: '1px solid rgba(221, 153, 187, 0.3)', padding: '6px 12px', borderRadius: '20px', marginBottom: '1.5rem', fontSize: '0.85rem', color: '#EAD7D1' }}>
-                         <strong>{globalCount}</strong> {t('messages_count')}
+                        <strong>{globalCount}</strong> {t('messages_count')}
                     </div>
 
                     <AnimatePresence mode='wait'>
                         {showMyMessages ? (
-                            // --- قسم عرض الرسائل السابقة للمستخدم ---
                             <motion.div
                                 key="my-messages"
                                 initial={{ opacity: 0, height: 0 }}
@@ -198,7 +216,6 @@ const Contact = () => {
                                 )}
                             </motion.div>
                         ) : (
-                            // --- الفورم الأساسي ---
                             <motion.form
                                 key="contact-form"
                                 initial={{ opacity: 0, height: 0 }}
@@ -216,7 +233,7 @@ const Contact = () => {
                                         onChange={handleChange}
                                         required
                                         placeholder={t('name_placeholder')}
-                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}
+                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)', boxSizing: 'border-box' }}
                                     />
                                 </div>
 
@@ -229,7 +246,7 @@ const Contact = () => {
                                         onChange={handleChange}
                                         required
                                         placeholder={t('email_placeholder')}
-                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}
+                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)', boxSizing: 'border-box' }}
                                     />
                                 </div>
 
@@ -242,7 +259,7 @@ const Contact = () => {
                                         onChange={handleChange}
                                         required
                                         placeholder={t('message_placeholder')}
-                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', resize: 'none', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}
+                                        style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: 'none', backgroundColor: 'rgba(0, 0, 0, 0.25)', color: '#fff', outline: 'none', fontFamily: 'inherit', fontSize: '0.95rem', resize: 'none', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)', boxSizing: 'border-box' }}
                                     />
                                 </div>
 
@@ -274,18 +291,13 @@ const Contact = () => {
                     </AnimatePresence>
                 </motion.div>
 
-                {/* --- النصف الأيمن: مجسم الـ 3D --- */}
                 <motion.div
-                    initial={{ opacity: 0, x: 50 }}
+                    className="contact-earth-side"
+                    initial={{ opacity: 0, x: isAr ? -50 : 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
                     viewport={{ once: true }}
                     style={{
-                        flex: '1 1 600px',
-                        height: '700px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         cursor: 'grab'
                     }}
                 >
@@ -311,7 +323,6 @@ const Contact = () => {
 
             </div>
 
-            {/* --- الشريط السفلي المستقل (Footer) --- */}
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}

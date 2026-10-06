@@ -1,14 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import ImageReveal from '../components/ImageReveal'; // 👈 استدعاء مكون الصورة
+import ImageReveal from '../components/ImageReveal';
 
 // --- زر Neon Equalizer ---
 const BAR_COUNT = 22;
 const SIGMA = 0.16;
 const MAX_BOOST = 0.75;
 
-const NeonEqualizerButton = ({ text }) => {
+// 👇 التعديل الأول: إضافة onClick هنا لاستقبال حدث الضغط
+const NeonEqualizerButton = ({ text, onClick }) => {
     const btnRef = useRef(null);
     const barsRef = useRef([]);
     const pointerRef = useRef({ x: 0.5, y: 0.5, influence: 0, target: 0 });
@@ -83,7 +84,8 @@ const NeonEqualizerButton = ({ text }) => {
     }, []);
 
     return (
-        <button className="btn-neon-equalizer" ref={btnRef}>
+        // 👇 ربط الـ onClick بالزر الفعلي هنا
+        <button className="btn-neon-equalizer" ref={btnRef} onClick={onClick} style={{ flexShrink: 0, minWidth: '180px' }}>
             <span className="btn-text">{text}</span>
             <div className="equalizer-container">
                 {barPropsRef.current.map((_, i) => (
@@ -107,42 +109,38 @@ const PdfIcon = () => (
     </svg>
 );
 
-// --- زر التحميل (اللون الوردي المضيء Pink Mist) ---
+// --- زر التحميل ---
 const VideoStyleDownloadButton = ({ cvUrl = '/Sarah_Hajjo_CV.pdf', label, successLabel }) => {
     const [status, setStatus] = useState('idle');
     const linkRef = useRef(null);
 
     const handleClick = () => {
         if (status !== 'idle') return;
-
         setStatus('animating');
-
         setTimeout(() => {
             setStatus('success');
             linkRef.current?.click();
-
             setTimeout(() => {
                 setStatus('idle');
             }, 2500);
-
         }, 2000);
     };
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', flexShrink: 0 }}>
             <motion.button
                 onClick={handleClick}
                 initial="idle"
                 animate={status}
                 variants={{
                     idle: {
-                        borderColor: 'rgba(234, 215, 209, 0.4)', // Powder Petal
+                        borderColor: 'rgba(234, 215, 209, 0.4)',
                         boxShadow: '0px 0px 0px transparent',
                         backgroundColor: 'transparent',
                         color: '#EAD7D1'
                     },
                     animating: {
-                        borderColor: '#DD99BB', // Pink Mist
+                        borderColor: '#DD99BB',
                         boxShadow: '0px 0px 20px rgba(221, 153, 187, 0.6)',
                         backgroundColor: 'transparent',
                         color: '#DD99BB'
@@ -157,7 +155,7 @@ const VideoStyleDownloadButton = ({ cvUrl = '/Sarah_Hajjo_CV.pdf', label, succes
                 transition={{ duration: 0.3 }}
                 style={{
                     position: 'relative',
-                    width: '240px',
+                    width: '220px',
                     height: '52px',
                     borderRadius: '26px',
                     border: '2px solid',
@@ -167,7 +165,7 @@ const VideoStyleDownloadButton = ({ cvUrl = '/Sarah_Hajjo_CV.pdf', label, succes
                     cursor: 'pointer',
                     fontFamily: 'Space Mono, monospace',
                     fontWeight: 'bold',
-                    fontSize: '0.95rem',
+                    fontSize: '0.9rem',
                     letterSpacing: '1px',
                     padding: 0,
                     outline: 'none',
@@ -259,6 +257,14 @@ const Hero = () => {
     const isAr = i18n.language === 'ar';
     const slideDirection = isAr ? 50 : -50;
 
+    // 👇 دالة التنقل السلس إلى قسم المشاريع
+    const handleScrollToProjects = () => {
+        const projectsSection = document.getElementById('projects');
+        if (projectsSection) {
+            projectsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <section
             id="hero"
@@ -267,20 +273,86 @@ const Hero = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                padding: isAr ? '0 5% 0 0' : '0 0 0 5%',
                 position: 'relative',
                 overflow: 'hidden'
             }}
         >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: '-80px' }}>
+            <style>{`
+                .hero-layout {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    max-width: 100vw;
+                    padding: 0 5%;
+                    margin-top: -80px;
+                    box-sizing: border-box;
+                }
+                .hero-text-section { 
+                    flex: 1; 
+                    z-index: 2; 
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    box-sizing: border-box;
+                }
+                .hero-image-section { 
+                    flex: 1.2; 
+                    height: 100vh; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: flex-end; 
+                    z-index: 0; 
+                    padding-top: 60px; 
+                    box-sizing: border-box;
+                }
+                .hero-buttons { 
+                    display: flex; 
+                    gap: 1rem; 
+                    align-items: center; 
+                    flex-wrap: wrap; 
+                }
+                
+                @media (max-width: 950px) {
+                    .hero-layout { 
+                        flex-direction: column; 
+                        text-align: center; 
+                        margin-top: 100px; 
+                        padding: 0 15px; 
+                        overflow-x: hidden;
+                    }
+                    .hero-text-section {
+                        align-items: center; 
+                        width: 100%;
+                    }
+                    .hero-image-section { 
+                        height: 40vh; 
+                        justify-content: center; 
+                        padding-top: 20px; 
+                        width: 100%; 
+                    }
+                    .hero-buttons { 
+                        justify-content: center; 
+                        margin-top: 1rem; 
+                        width: 100%;
+                    }
+                }
+            `}</style>
+
+            <div className="hero-layout" style={{ direction: isAr ? 'rtl' : 'ltr' }}>
 
                 {/* --- الجزء الأيسر: النصوص والأزرار --- */}
-                <div style={{ flex: 1, zIndex: 2 }}>
-                    <motion.div initial={{ opacity: 0, x: slideDirection }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}>
-                        <p className="tech-font" style={{ color: 'var(--text-secondary)', fontSize: '1rem', letterSpacing: '2px', marginBottom: '1rem' }}>
+                <div className="hero-text-section">
+                    <motion.div
+                        initial={{ opacity: 0, x: slideDirection }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        style={{ width: '100%' }}
+                    >
+                        <p className="tech-font" style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.9rem, 3vw, 1rem)', letterSpacing: '2px', marginBottom: '1rem' }}>
                             {t('greeting')} {t('name')}
                         </p>
-                        <h1 className="tech-font" style={{ fontSize: '4.5rem', margin: '0 0 1.5rem 0', fontWeight: '700', color: 'var(--text-primary)', lineHeight: '1.1' }}>
+                        <h1 className="tech-font" style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', margin: '0 0 1.5rem 0', fontWeight: '700', color: 'var(--text-primary)', lineHeight: '1.1' }}>
                             <div>
                                 <AnimatedText text={t('title_1')} baseDelay={0.1} isArabic={isAr} />
                             </div>
@@ -299,31 +371,35 @@ const Hero = () => {
                         </h1>
                     </motion.div>
 
-                    <motion.p initial={{ opacity: 0, x: slideDirection }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }} className="tech-font" style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', maxWidth: '500px', lineHeight: '1.8', marginBottom: '2.5rem' }}>
+                    <motion.p
+                        initial={{ opacity: 0, x: slideDirection }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+                        className="tech-font hero-description"
+                        style={{
+                            fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                            color: 'var(--text-secondary)',
+                            width: '100%',
+                            maxWidth: '500px',
+                            lineHeight: '1.8',
+                            marginBottom: '2.5rem',
+                            marginInline: 'auto',
+                            boxSizing: 'border-box',
+                            padding: '0 5px'
+                        }}
+                    >
                         {t('role')}
                     </motion.p>
 
-                    <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 1.2, ease: "easeOut" }} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <NeonEqualizerButton text={t('view_projects')} />
+                    <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 1.2, ease: "easeOut" }} className="hero-buttons">
+                        {/* 👇 ربط الدالة الجديدة بزر المشاريع */}
+                        <NeonEqualizerButton text={t('view_projects')} onClick={handleScrollToProjects} />
                         <VideoStyleDownloadButton label={t('download_cv')} successLabel={t('downloaded')} />
                     </motion.div>
                 </div>
 
-                {/* --- الجزء الأيمن: مكون الصورة ImageReveal بدلاً من الـ 3D --- */}
-                <div style={{
-                    flex: 1.2,
-                    height: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    zIndex: 0,
-                    paddingTop: '60px',
-                    ...(isAr
-                            ? { paddingLeft: '0', marginLeft: '2%', transform: 'translateX(40px)' }
-                            : { paddingRight: '0', marginRight: '2%', transform: 'translateX(-40px)' }
-                    )
-                }}>
-                    {/* استدعاء مكون الصورة هنا */}
+                {/* --- الجزء الأيمن: مكون الصورة --- */}
+                <div className="hero-image-section">
                     <ImageReveal />
                 </div>
             </div>

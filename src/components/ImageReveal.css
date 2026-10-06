@@ -1,16 +1,10 @@
 .image-grid-wrapper {
     width: 100%;
+    /* ارتفاع افتراضي للشاشات الكبيرة */
     height: 95vh;
     position: relative;
     overflow: hidden;
-
     border-radius: 60px;
-
-    /* 🔥 التعديل هنا:
-       - أعدنا المركز إلى 50% (المنتصف تماماً).
-       - جعلنا الصورة الصلبة (black) 20% فقط في المنتصف.
-       - جعلنا التلاشي (transparent) يصل للشفافية الكاملة عند 70% (قبل الوصول لأي حافة).
-       هذا سيذيب الخط الأيسر والأيمن بنفس القوة! */
     -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
     mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
 }
@@ -19,4 +13,12 @@
     position: absolute;
     background-repeat: no-repeat;
     will-change: transform, opacity;
+}
+
+/* 👇 أضفنا استعلام وسائط لتقليل الارتفاع في الموبايل */
+@media (max-width: 950px) {
+    .image-grid-wrapper {
+        height: 40vh; /* 👈 تقليل الارتفاع للموبايل لمنع الشد المطّاطي للصورة */
+        border-radius: 30px; /* تقليل نصف القطر ليتناسب مع الحجم الجديد */
+    }
 }

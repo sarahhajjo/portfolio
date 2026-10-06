@@ -3,9 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
-import ContactBar from '../components/ContactBar'; // 👈 شريط معلومات التواصل بآخر الصفحة
+import ContactBar from '../components/ContactBar';
 
-// مكون زر الجيت هب
 const GithubButton = ({ href, children }) => (
     <a
         href={href}
@@ -74,7 +73,6 @@ const ProjectDetails = () => {
                     </p>
                 </div>
             ),
-            // جلب القوائم والمميزات من ملف الترجمة كمصفوفة
             featuresConfig: t('proj1_features', { returnObjects: true }),
             secondaryNote: t('proj1_sec_note'),
             image: '/projects/img.png',
@@ -149,6 +147,7 @@ const ProjectDetails = () => {
 
     return (
         <div style={{ minHeight: '100vh', overflowX: 'hidden' }}>
+            {/* 👇 ستايلات مخصصة لحل مشاكل التجاوب (Responsive) */}
             <style>{`
                 .features-grid {
                     display: grid;
@@ -165,6 +164,60 @@ const ProjectDetails = () => {
                     padding-top: 2.5rem;
                 }
                 .features-left, .features-right, .features-right-lists { display: contents; }
+                
+                /* صندوق التفاصيل العام */
+                .details-box {
+                    border: 1px solid rgba(221, 153, 187, 0.3);
+                    border-radius: 24px;
+                    padding: 3rem;
+                    background-color: rgba(31, 26, 56, 0.4);
+                    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                    backdrop-filter: blur(10px);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3rem;
+                    max-width: 100vw;
+                    box-sizing: border-box;
+                }
+                
+                .header-flex {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 4rem;
+                    align-items: flex-start;
+                    width: 100%;
+                }
+                
+                .video-section {
+                    flex: 1 1 500px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
+                    width: 100%;
+                    max-width: 100%;
+                }
+                
+                .text-section {
+                    flex: 1 1 300px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
+                    width: 100%;
+                    max-width: 100%;
+                }
+
+                @media (max-width: 768px) {
+                    .details-box {
+                        padding: 1.5rem; /* تصغير الهوامش في الموبايل */
+                    }
+                    .header-flex {
+                        gap: 2rem;
+                    }
+                    /* إجبار النص على الالتفاف (Wrap) لعدم تجاوز الشاشة */
+                    .text-section p, .text-section div {
+                        word-wrap: break-word;
+                    }
+                }
 
                 @media (min-width: 1250px) {
                     .features-split {
@@ -194,36 +247,22 @@ const ProjectDetails = () => {
             <Navbar />
 
             <section style={{
-                padding: '120px 5% 2rem 5%', // 👈 قلّلت الـ padding السفلي لأنو الشريط جاي بعده
+                padding: '120px 5% 2rem 5%',
                 maxWidth: '1400px',
                 margin: '0 auto',
-                direction: isAr ? 'rtl' : 'ltr'
+                direction: isAr ? 'rtl' : 'ltr',
+                boxSizing: 'border-box'
             }}>
 
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    style={{
-                        border: '1px solid rgba(221, 153, 187, 0.3)',
-                        borderRadius: '24px',
-                        padding: '3rem',
-                        backgroundColor: 'rgba(31, 26, 56, 0.4)',
-                        boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
-                        backdropFilter: 'blur(10px)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '3rem'
-                    }}
+                    className="details-box" // استخدام الكلاس الجديد هنا
                 >
 
-                    <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '4rem',
-                        alignItems: 'flex-start'
-                    }}>
-                        <div style={{ flex: '1 1 500px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div className="header-flex">
+                        <div className="video-section">
                             <div style={{
                                 width: '100%',
                                 borderRadius: '16px',
@@ -260,16 +299,17 @@ const ProjectDetails = () => {
                             )}
                         </div>
 
-                        <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <h1 className="tech-font" style={{ fontSize: '3.5rem', margin: 0, color: '#DD99BB', lineHeight: 1.1 }}>
+                        <div className="text-section">
+                            {/* 👇 استخدام clamp لتصغير حجم عنوان المشروع تلقائياً في الموبايل */}
+                            <h1 className="tech-font" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', margin: 0, color: '#DD99BB', lineHeight: 1.1 }}>
                                 {project.title}
                             </h1>
 
-                            <div style={{ display: 'flex', gap: '1.2rem', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
                                 {project.tags.map(tag => (
                                     <span key={tag} style={{
                                         color: getTagColor(tag),
-                                        fontSize: '1rem',
+                                        fontSize: '0.9rem',
                                         fontWeight: 'bold',
                                         letterSpacing: '1px'
                                     }}>
@@ -278,7 +318,7 @@ const ProjectDetails = () => {
                                 ))}
                             </div>
 
-                            <div style={{ color: '#ffffff', fontSize: '1.1rem', lineHeight: '1.8', marginTop: '1rem' }}>
+                            <div style={{ color: '#ffffff', fontSize: '1rem', lineHeight: '1.8', marginTop: '0.5rem' }}>
                                 {project.longDescription}
                             </div>
                         </div>
@@ -369,7 +409,6 @@ const ProjectDetails = () => {
                 </motion.div>
             </section>
 
-            {/* 👇 شريط معلومات التواصل بآخر الصفحة */}
             <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 5% 2.5rem 5%', boxSizing: 'border-box' }}>
                 <ContactBar />
             </div>
