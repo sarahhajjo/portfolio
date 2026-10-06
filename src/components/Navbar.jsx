@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom'; // 👈 استدعاء خصائص التنقل
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // --- أيقونات التواصل ---
 const GithubIcon = () => (
@@ -12,12 +12,15 @@ const EmailIcon = () => (
 );
 
 const Navbar = () => {
-    const { i18n } = useTranslation();
+    // 👇 استدعاء دالة الترجمة لمعرفة اللغة الحالية
+    const { t, i18n } = useTranslation();
+    const isAr = i18n.language === 'ar';
+
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isImageOpen, setIsImageOpen] = useState(false);
 
-    // 👇 التحقق إذا كنا في صفحة المشاريع
+    // التحقق إذا كنا في صفحة المشاريع
     const location = useLocation();
     const navigate = useNavigate();
     const isProjectPage = location.pathname.includes('/projects/');
@@ -40,7 +43,7 @@ const Navbar = () => {
         setIsLangOpen(false);
     };
 
-    const currentLangName = i18n.language === 'ar' ? 'العربية' : 'English';
+    const currentLangName = isAr ? 'العربية' : 'English';
 
     return (
         <>
@@ -57,13 +60,14 @@ const Navbar = () => {
                 backgroundColor: isScrolled ? 'rgba(15, 10, 25, 0.8)' : 'transparent',
                 backdropFilter: isScrolled ? 'blur(10px)' : 'none',
                 borderBottom: isScrolled ? '1px solid rgba(221, 153, 187, 0.1)' : '1px solid transparent',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                direction: isAr ? 'rtl' : 'ltr' // لضمان بقاء اتجاه الشريط متناسقاً
             }}>
 
                 {/* --- الجزء الأيسر --- */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
 
-                    {/* 👇 زر العودة يظهر فقط إذا كنا في صفحة التفاصيل */}
+                    {/* 👇 زر العودة مع تبديل الاتجاه واللغة */}
                     {isProjectPage && (
                         <button
                             onClick={() => navigate('/')}
@@ -83,7 +87,7 @@ const Navbar = () => {
                             onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--accent-light)'}
                             onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(234, 215, 209, 0.4)'}
                         >
-                            ← Back
+                            {isAr ? 'رجوع →' : '← Back'}
                         </button>
                     )}
 
@@ -96,11 +100,12 @@ const Navbar = () => {
                         <img src="/profile.png" alt="Sarah Hajjo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
                     </div>
 
+                    {/* 👇 تغيير الاسم حسب اللغة هنا */}
                     <span className="tech-font" style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--text-primary)', letterSpacing: '1px' }}>
-                        Sarah Hajjo
+                        {isAr ? 'سارة حجّو' : 'Sarah Hajjo'}
                     </span>
 
-                    <div style={{ display: 'flex', gap: '12px', marginLeft: '10px' }}>
+                    <div style={{ display: 'flex', gap: '12px', marginInlineStart: '10px' }}>
                         <a href="https://github.com/sarahhajjo" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', transition: 'color 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'} title="GitHub"><GithubIcon /></a>
                         <a href="mailto:sarahhajjo98@gmail.com" style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', transition: 'color 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'} title="Email"><EmailIcon /></a>
                     </div>
@@ -114,9 +119,9 @@ const Navbar = () => {
                     </button>
 
                     {isLangOpen && (
-                        <div style={{ position: 'absolute', top: '120%', right: i18n.language === 'en' ? 0 : 'auto', left: i18n.language === 'ar' ? 0 : 'auto', backgroundColor: 'var(--bg-color)', border: '2px solid var(--accent-light)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', minWidth: '120px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)' }}>
-                            <button className="tech-font" onClick={() => changeLanguage('en')} style={{ padding: '10px 15px', backgroundColor: i18n.language === 'en' ? 'var(--accent-light)' : 'transparent', color: i18n.language === 'en' ? 'var(--accent-dark)' : 'var(--text-primary)', border: 'none', textAlign: i18n.language === 'ar' ? 'right' : 'left', cursor: 'pointer', fontWeight: 'bold' }}>English</button>
-                            <button className="tech-font" onClick={() => changeLanguage('ar')} style={{ padding: '10px 15px', backgroundColor: i18n.language === 'ar' ? 'var(--accent-light)' : 'transparent', color: i18n.language === 'ar' ? 'var(--accent-dark)' : 'var(--text-primary)', border: 'none', textAlign: i18n.language === 'ar' ? 'right' : 'left', cursor: 'pointer', fontWeight: 'bold' }}>العربية</button>
+                        <div style={{ position: 'absolute', top: '120%', right: isAr ? 'auto' : 0, left: isAr ? 0 : 'auto', backgroundColor: 'var(--bg-color)', border: '2px solid var(--accent-light)', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', minWidth: '120px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)' }}>
+                            <button className="tech-font" onClick={() => changeLanguage('en')} style={{ padding: '10px 15px', backgroundColor: !isAr ? 'var(--accent-light)' : 'transparent', color: !isAr ? 'var(--accent-dark)' : 'var(--text-primary)', border: 'none', textAlign: isAr ? 'right' : 'left', cursor: 'pointer', fontWeight: 'bold' }}>English</button>
+                            <button className="tech-font" onClick={() => changeLanguage('ar')} style={{ padding: '10px 15px', backgroundColor: isAr ? 'var(--accent-light)' : 'transparent', color: isAr ? 'var(--accent-dark)' : 'var(--text-primary)', border: 'none', textAlign: isAr ? 'right' : 'left', cursor: 'pointer', fontWeight: 'bold' }}>العربية</button>
                         </div>
                     )}
                 </div>
@@ -125,7 +130,7 @@ const Navbar = () => {
             <AnimatePresence>
                 {isImageOpen && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} onClick={() => setIsImageOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10, 5, 20, 0.85)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'zoom-out' }}>
-                        <button onClick={() => setIsImageOpen(false)} style={{ position: 'absolute', top: '30px', right: '40px', background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '2.5rem', cursor: 'pointer', zIndex: 1001 }}>&times;</button>
+                        <button onClick={() => setIsImageOpen(false)} style={{ position: 'absolute', top: '30px', right: isAr ? 'auto' : '40px', left: isAr ? '40px' : 'auto', background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '2.5rem', cursor: 'pointer', zIndex: 1001 }}>&times;</button>
                         <motion.img initial={{ scale: 0.5, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.8, opacity: 0, y: 20 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} src="/profile.png" alt="Sarah Hajjo" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: '20px', border: '2px solid rgba(221, 153, 187, 0.5)', boxShadow: '0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(221, 153, 187, 0.2)', cursor: 'default' }} />
                     </motion.div>
                 )}

@@ -1,8 +1,9 @@
-import React, { Suspense, useRef } from 'react';
+import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Float, Environment, PresentationControls, useTexture } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import * as THREE from 'three';
+import { useTranslation } from 'react-i18next';
 
 // --- مكون الشكل المضلع الواحد مع الأيقونة العائمة ---
 const SkillPolygon = ({ position, iconPath, baseColor, glowColor }) => {
@@ -21,7 +22,6 @@ const SkillPolygon = ({ position, iconPath, baseColor, glowColor }) => {
                 >
                     <group scale={3.6}>
 
-                        {/* 1. المجسم الأساسي (المسدس) بألوانه المدموجة */}
                         <mesh>
                             <icosahedronGeometry args={[1, 0]} />
                             <meshStandardMaterial
@@ -34,9 +34,7 @@ const SkillPolygon = ({ position, iconPath, baseColor, glowColor }) => {
                             />
                         </mesh>
 
-                        {/* 2. الأيقونة العائمة أمامه (تم تقريبها للمركز لتقف على رأس المجسم تماماً) */}
                         <mesh position={[0, 0, 1.05]}>
-                            {/* تم تكبير الأيقونة قليلاً لتعويض بُعد الكاميرا الجديد ولتبدو أجمل */}
                             <planeGeometry args={[1.3, 1.3]} />
                             <meshBasicMaterial
                                 map={texture}
@@ -54,6 +52,9 @@ const SkillPolygon = ({ position, iconPath, baseColor, glowColor }) => {
 };
 
 const Skills = () => {
+    const { i18n } = useTranslation();
+    const isAr = i18n.language === 'ar'; // 👈 التحقق من اللغة
+
     const programmingLanguages = [
         { pos: [-31, 8, 0], icon: '/icons/c++-removebg-preview.png', color: '#00599C' },
         { pos: [-22, 8, 0], icon: '/icons/java-removebg-preview.png', color: '#E76F00', glowColor: '#5382A1' },
@@ -88,15 +89,19 @@ const Skills = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
-                style={{ textAlign: 'center', marginBottom: '2rem' }}
+                style={{ textAlign: 'center', marginBottom: '2rem', direction: isAr ? 'rtl' : 'ltr' }}
             >
+                {/* 👇 تم الحل هنا! سيظهر العنوان بشكل مثالي ومترجم مع تلوين حرف الـ (و) وحرف الـ (&) */}
                 <h2 className="tech-font" style={{ fontSize: '3.5rem', color: 'var(--text-primary)', margin: 0 }}>
-                    Skills <span style={{ color: 'var(--accent-light)' }}>&</span> Technologies
+                    {isAr ? (
+                        <>المهارات <span style={{ color: 'var(--accent-light)' }}>و</span> التقنيات</>
+                    ) : (
+                        <>Skills <span style={{ color: 'var(--accent-light)' }}>&</span> Technologies</>
+                    )}
                 </h2>
             </motion.div>
 
             <div style={{ width: '100%', height: '70vh', minHeight: '500px' }}>
-                {/* 👇 هنا السحر: أرجعنا الكاميرا لـ 190 ووضعنا fov: 10 لتسوية المنظور وتوسيط جميع الأيقونات بدقة متناهية */}
                 <Canvas camera={{ position: [0, 0, 190], fov: 10 }}>
                     <ambientLight intensity={0.6} />
                     <directionalLight position={[10, 10, 5]} intensity={1.5} color="#ffffff" />

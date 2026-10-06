@@ -5,7 +5,6 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import EarthModel from '../components/EarthModel.jsx';
 
-// --- أيقونات معلومات التواصل ---
 const EmailIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.866l5.6-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z"/></svg>
 );
@@ -20,37 +19,35 @@ const LocationIcon = () => (
 );
 
 const Contact = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(); // 👈 استدعاء دالة الترجمة هنا
 
     return (
         <section
             id="contact"
             style={{
-                padding: '6rem 5% 2rem 5%', // تقليل المساحة السفلية ليتسع الشريط
+                padding: '6rem 5% 2rem 5%',
                 backgroundColor: 'var(--bg-color)',
                 minHeight: '100vh',
                 display: 'flex',
-                flexDirection: 'column', // تحويل العرض إلى عمودي ليتسع الشريط السفلي
-                justifyContent: 'space-between', // توزيع المسافات بين الأعلى والأسفل
+                flexDirection: 'column',
+                justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden'
             }}
         >
-            {/* --- القسم العلوي: الفورم والكرة الأرضية --- */}
             <div style={{
                 display: 'flex',
                 flexDirection: 'row',
                 flexWrap: 'wrap',
                 width: '100%',
                 maxWidth: '1300px',
-                margin: '0 auto', // توسيط المحتوى
+                margin: '0 auto',
                 gap: '2rem',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flex: 1
             }}>
 
-                {/* --- النصف الأيسر: نموذج التواصل --- */}
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -68,15 +65,15 @@ const Contact = () => {
                     }}
                 >
                     <h2 className="tech-font" style={{ fontSize: '2.5rem', marginBottom: '2rem', color: 'var(--text-primary)', marginTop: 0 }}>
-                        Get In <span style={{ color: 'var(--accent-light)' }}>Touch</span>
+                        {t('contact_title_get')} <span style={{ color: 'var(--accent-light)' }}>{t('contact_title_touch')}</span>
                     </h2>
 
                     <form style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>Your Name</label>
+                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_name')}</label>
                             <input
                                 type="text"
-                                placeholder="What's your name?"
+                                placeholder={t('name_placeholder')}
                                 style={{
                                     width: '100%',
                                     padding: '0.9rem',
@@ -93,10 +90,10 @@ const Contact = () => {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>Your Email</label>
+                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_email')}</label>
                             <input
                                 type="email"
-                                placeholder="What's your email?"
+                                placeholder={t('email_placeholder')}
                                 style={{
                                     width: '100%',
                                     padding: '0.9rem',
@@ -113,10 +110,10 @@ const Contact = () => {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>Your Message</label>
+                            <label className="tech-font" style={{ color: '#EAD7D1', fontSize: '0.85rem', fontWeight: 'bold' }}>{t('your_message')}</label>
                             <textarea
                                 rows="4"
-                                placeholder="What's your message?"
+                                placeholder={t('message_placeholder')}
                                 style={{
                                     width: '100%',
                                     padding: '0.9rem',
@@ -152,12 +149,11 @@ const Contact = () => {
                             onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(221, 153, 187, 0.3)'}
                             onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(221, 153, 187, 0.1)'}
                         >
-                            Send Message
+                            {t('send_btn')}
                         </button>
                     </form>
                 </motion.div>
 
-                {/* --- النصف الأيمن: مجسم الـ 3D --- */}
                 <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -194,7 +190,6 @@ const Contact = () => {
 
             </div>
 
-            {/* --- الشريط السفلي المستقل (Footer) لمعلومات التواصل --- */}
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -202,7 +197,7 @@ const Contact = () => {
                 viewport={{ once: true }}
                 style={{
                     width: '100%',
-                    borderTop: '1px solid rgba(221, 153, 187, 0.2)', // خط علوي يفصل الشريط عن المحتوى
+                    borderTop: '1px solid rgba(221, 153, 187, 0.2)',
                     paddingTop: '2rem',
                     marginTop: '2rem',
                     display: 'flex',
@@ -211,25 +206,21 @@ const Contact = () => {
                     gap: '3rem'
                 }}
             >
-                {/* رقم الهاتف */}
                 <a href="tel:+963967348415" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#EAD7D1', textDecoration: 'none', fontSize: '1rem', transition: 'color 0.3s' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = '#EAD7D1'}>
                     <PhoneIcon/>
                     <span className="tech-font" style={{ direction: 'ltr' }}>+963 967348415</span>
                 </a>
 
-                {/* الإيميل */}
                 <a href="mailto:sarahhajjo98@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#EAD7D1', textDecoration: 'none', fontSize: '1rem', transition: 'color 0.3s' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = '#EAD7D1'}>
                     <EmailIcon/>
                     <span className="tech-font">sarahhajjo98@gmail.com</span>
                 </a>
 
-                {/* الموقع الجغرافي */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#EAD7D1', fontSize: '1rem' }}>
                     <LocationIcon/>
-                    <span className="tech-font">Damascus, Syria</span>
+                    <span className="tech-font">{t('damascus')}</span>
                 </div>
 
-                {/* حساب GitHub */}
                 <a href="https://github.com/sarahhajjo" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#EAD7D1', textDecoration: 'none', fontSize: '1rem', transition: 'color 0.3s' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--accent-light)'} onMouseOut={(e) => e.currentTarget.style.color = '#EAD7D1'}>
                     <GithubIcon/>
                     <span className="tech-font">/sarahhajjo</span>
