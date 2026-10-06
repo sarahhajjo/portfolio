@@ -52,8 +52,9 @@ const Contact = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
+        // 👇 هنا تم استدعاء المفتاح من ملف البيئة المخفي
         const payload = {
-            access_key: "4cd1f4bb-4aac-43eb-860b-dddd15f79f3f",
+            access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
             name: formData.name,
             email: formData.email,
             message: formData.message,
@@ -136,17 +137,16 @@ const Contact = () => {
                     .contact-layout {
                         flex-direction: column;
                         gap: 2rem;
-                        margin-top: 60px; /* 👈 هذه المسافة ستبعد الفورم عن الشريط العلوي */
+                        margin-top: 60px;
                     }
                     .contact-form-side {
                         max-width: 100%;
                     }
-                    /* 👈 تصغير الحواف الداخلية للفورم ليعطي مساحة أكبر لحقول الكتابة */
                     .form-container {
                         padding: 1.5rem !important;
                     }
                     .contact-earth-side {
-                        height: 350px; /* 👈 تقليل ارتفاع الكرة الأرضية لتناسب الموبايل */
+                        height: 350px;
                     }
                 }
             `}</style>
