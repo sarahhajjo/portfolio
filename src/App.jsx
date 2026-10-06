@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // 👈 استدعاء مكتبة التوجيه
 
 import Navbar from './components/Navbar';
+import GradientWaves from './components/GradientWaves'; // 👈 خلفية الموجات المتحركة
 import Hero from './sections/Hero';
 import Skills from './sections/Skills';
 import Projects from './sections/Projects';
@@ -34,13 +35,16 @@ function App() {
 
     return (
         <Router>
-            <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh' }}>
+            {/* خلفية الموجات ثابتة وراء كل الصفحات (الرئيسية + تفاصيل المشروع) */}
+            <GradientWaves />
+
+            {/* ⚠️ شلنا backgroundColor من هون عشان ما يغطي الخلفية المتحركة (لون الخلفية جاي من GradientWaves ومن body) */}
+            <div style={{ minHeight: '100vh' }}>
                 <Routes>
                     {/* 1. مسار الصفحة الرئيسية (يضم كل الأقسام) */}
                     <Route path="/" element={<Home />} />
 
                     {/* 2. مسار صفحة تفاصيل المشروع المستقلة */}
-                    {/* عدلي هذا السطر ليكون projects بدلاً من project */}
                     <Route path="/projects/:id" element={<ProjectDetails />} />
                 </Routes>
             </div>

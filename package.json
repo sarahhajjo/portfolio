@@ -20,7 +20,9 @@
     "react-dom": "^19.2.8",
     "react-i18next": "^17.0.15",
     "react-router-dom": "^7.18.4",
-    "three": "^0.186.1"
+    "three": "^0.186.1",
+    "three134": "npm:three@^0.134.0",
+    "vanta": "^0.5.24"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

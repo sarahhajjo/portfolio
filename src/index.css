@@ -109,3 +109,7 @@ body {
   border-color: var(--accent-light);
   transform: translateY(-2px);
 }
+/* خلي كل الأقسام شفافة عشان تظهر خلفية الموجات المتحركة وراها */
+section {
+  background: transparent !important;
+}
