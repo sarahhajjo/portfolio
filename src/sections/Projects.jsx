@@ -1,13 +1,232 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, useMotionValue } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // 👈 استدعاء مكتبة الترجمة
+import { useTranslation } from 'react-i18next';
+
+// --- زر Supernova (نفس الزر البنفسجي من الفيديو: قبل الهوفر وبعده) ---
+const SupernovaButton = ({ text, onClick }) => {
+    const ref = useRef(null);
+    const [hovered, setHovered] = useState(false);
+    const mx = useMotionValue(0);
+    const my = useMotionValue(0);
+
+    const handleMove = (e) => {
+        if (!ref.current) return;
+        const r = ref.current.getBoundingClientRect();
+        mx.set(e.clientX - r.left);
+        my.set(e.clientY - r.top);
+    };
+
+    const handleEnter = (e) => {
+        handleMove(e);
+        setHovered(true);
+    };
+
+    return (
+        <motion.button
+            ref={ref}
+            onClick={onClick}
+            onMouseEnter={handleEnter}
+            onMouseMove={handleMove}
+            onMouseLeave={() => setHovered(false)}
+            whileTap={{ scale: 0.97 }}
+            animate={
+                hovered
+                    ? {
+                        borderColor: 'rgba(192, 132, 252, 1)',
+                        boxShadow:
+                            '0 0 18px rgba(168, 85, 247, 0.65), inset 0 0 14px rgba(168, 85, 247, 0.35)',
+                    }
+                    : {
+                        borderColor: 'rgba(168, 85, 247, 0.45)',
+                        boxShadow:
+                            '0 0 6px rgba(168, 85, 247, 0.15), inset 0 0 8px rgba(168, 85, 247, 0.12)',
+                    }
+            }
+            transition={{ duration: 0.3 }}
+            className="tech-font"
+            style={{
+                position: 'relative',
+                overflow: 'hidden',
+                background:
+                    'linear-gradient(135deg, rgba(76, 29, 149, 0.55), rgba(46, 16, 101, 0.75))',
+                border: '1px solid rgba(168, 85, 247, 0.45)',
+                color: '#F3E8FF',
+                padding: '0.55rem 1.4rem',
+                borderRadius: '10px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                outline: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '110px',
+            }}
+        >
+            {/* خطوط أفقية خفيفة (scanlines) */}
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background:
+                        'repeating-linear-gradient(0deg, transparent 0 3px, rgba(168, 85, 247, 0.10) 3px 4px)',
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                }}
+            />
+
+            {/* --- الحالة العادية (قبل الهوفر): لمعة نجمية دوّارة + موجة خفيفة من المركز --- */}
+            {[0, 1].map((i) => (
+                <motion.div
+                    key={`glint-${i}`}
+                    animate={{
+                        rotate: i === 0 ? [15, 30, 15] : [-60, -45, -60],
+                        opacity: [0.25, 0.9, 0.25],
+                    }}
+                    transition={{
+                        duration: 3.2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: i * 0.8,
+                    }}
+                    style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '50%',
+                        width: '1px',
+                        height: '170%',
+                        x: '-50%',
+                        y: '-50%',
+                        background:
+                            'linear-gradient(to bottom, transparent, rgba(255,255,255,0.85), transparent)',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                    }}
+                />
+            ))}
+
+            {!hovered &&
+                [0, 1.2].map((delay) => (
+                    <motion.div
+                        key={`idle-ring-${delay}`}
+                        animate={{ scale: [0, 4], opacity: [0.35, 0] }}
+                        transition={{
+                            duration: 2.4,
+                            repeat: Infinity,
+                            delay,
+                            ease: 'easeOut',
+                        }}
+                        style={{
+                            position: 'absolute',
+                            left: '50%',
+                            top: '50%',
+                            width: '40px',
+                            height: '20px',
+                            border: '1px solid rgba(192, 132, 252, 0.7)',
+                            borderRadius: '50%',
+                            x: '-50%',
+                            y: '-50%',
+                            pointerEvents: 'none',
+                            zIndex: 1,
+                        }}
+                    />
+                ))}
+
+            <span
+                style={{
+                    position: 'relative',
+                    zIndex: 3,
+                    textShadow: '0 0 6px rgba(216, 180, 254, 0.7)',
+                }}
+            >
+                {text}
+            </span>
+
+            {/* --- حالة الهوفر: نقطة بيضاء + نجمة + موجات صدمة من مكان الماوس --- */}
+            {hovered && (
+                <>
+                    {[0, 0.5, 1.0].map((delay) => (
+                        <motion.div
+                            key={`ring-${delay}`}
+                            initial={{ scale: 0, opacity: 0.9 }}
+                            animate={{ scale: [0, 4.5], opacity: [0.9, 0] }}
+                            transition={{
+                                duration: 1.5,
+                                repeat: Infinity,
+                                delay,
+                                ease: 'easeOut',
+                            }}
+                            style={{
+                                position: 'absolute',
+                                left: mx,
+                                top: my,
+                                width: '36px',
+                                height: '20px',
+                                border: '1.5px solid rgba(192, 132, 252, 0.9)',
+                                borderRadius: '50%',
+                                x: '-50%',
+                                y: '-50%',
+                                pointerEvents: 'none',
+                                zIndex: 2,
+                            }}
+                        />
+                    ))}
+
+                    {/* نجمة / أشعة حول الماوس */}
+                    <motion.svg
+                        width="46"
+                        height="46"
+                        viewBox="-23 -23 46 46"
+                        animate={{ rotate: [0, 90], scale: [0.8, 1.2, 0.8] }}
+                        transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
+                        style={{
+                            position: 'absolute',
+                            left: mx,
+                            top: my,
+                            x: '-50%',
+                            y: '-50%',
+                            pointerEvents: 'none',
+                            zIndex: 4,
+                        }}
+                    >
+                        <g stroke="white" strokeLinecap="round" opacity="0.85">
+                            <line x1="-22" y1="0" x2="22" y2="0" strokeWidth="0.8" />
+                            <line x1="0" y1="-22" x2="0" y2="22" strokeWidth="0.8" />
+                            <line x1="-12" y1="-12" x2="12" y2="12" strokeWidth="0.5" />
+                            <line x1="12" y1="-12" x2="-12" y2="12" strokeWidth="0.5" />
+                        </g>
+                    </motion.svg>
+
+                    {/* النقطة البيضاء */}
+                    <motion.div
+                        style={{
+                            position: 'absolute',
+                            left: mx,
+                            top: my,
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            backgroundColor: '#fff',
+                            boxShadow: '0 0 8px 2px rgba(216, 180, 254, 0.9)',
+                            x: '-50%',
+                            y: '-50%',
+                            pointerEvents: 'none',
+                            zIndex: 5,
+                        }}
+                    />
+                </>
+            )}
+        </motion.button>
+    );
+};
 
 const Projects = () => {
     const navigate = useNavigate();
-    const { t } = useTranslation(); // 👈 تفعيل الترجمة
+    const { t } = useTranslation();
 
-    // 👇 الآن بيانات المشاريع تستدعي ترجمتها مباشرة من i18n
     const projectsData = [
         {
             id: 1,
@@ -151,7 +370,8 @@ const Projects = () => {
                             display: 'flex',
                             gap: '1rem',
                             marginTop: 'auto',
-                            justifyContent: project.hideDetailsButton ? 'flex-start' : 'space-between'
+                            justifyContent: project.hideDetailsButton ? 'flex-start' : 'space-between',
+                            alignItems: 'center'
                         }}>
                             <a
                                 href={project.githubUrl}
@@ -176,26 +396,10 @@ const Projects = () => {
                             </a>
 
                             {!project.hideDetailsButton && (
-                                <button
+                                <SupernovaButton
+                                    text={t('details_btn')}
                                     onClick={() => navigate(`/projects/${project.id}`)}
-                                    className="tech-font"
-                                    style={{
-                                        backgroundColor: 'rgba(234, 215, 209, 0.05)',
-                                        border: '1px solid rgba(234, 215, 209, 0.3)',
-                                        color: '#EAD7D1',
-                                        padding: '0.4rem 1rem',
-                                        borderRadius: '6px',
-                                        fontSize: '0.8rem',
-                                        fontWeight: 'bold',
-                                        letterSpacing: '1px',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease',
-                                    }}
-                                    onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(234, 215, 209, 0.1)'}
-                                    onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(234, 215, 209, 0.05)'}
-                                >
-                                    {t('details_btn')}
-                                </button>
+                                />
                             )}
                         </div>
                     </motion.div>
