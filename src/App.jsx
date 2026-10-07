@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // 👈 استدعاء مكتبة التوجيه
 
 import Navbar from './components/Navbar';
-import GradientWaves from './components/GradientWaves';
+import GradientWaves from './components/Gradientwaves.jsx';
 import Hero from './sections/Hero';
 import Skills from './sections/Skills';
 import Projects from './sections/Projects';
